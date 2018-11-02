@@ -15,7 +15,7 @@ class Compiler:
     def __init__(self,data):
         self.path=str(data[0])
         self.filename=str(data[1])
-        print(":::::::::::::: Welcome to Compiler ::::::::::::\n:: I'm in: "+self.path+"\n:: I'll compile: "+self.filename)
+        print("::::::::::::::::::Welcome to the compiler :::::::::::::::\n\n:: I'm in: "+self.path+"\n:: I'll compile: "+self.filename+"\n\n:::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
     def isPrepare(self):
         if self.path == None and self.filename == None:
             return False
@@ -48,7 +48,19 @@ class Compiler:
                             'col':self.col, 
                             'row':self.row,
                             'token':self.tokenize.reserved_values(word),
-                            'lexema':word
+                            'lexema':word,
+                            'type':type (word).__name__
+                        })
+                    elif(self.tokenize.isNumber(word)):
+                        self.col+=len(word)
+                        self.id+=1
+                        self.symbols.add({
+                            'id':self.id,
+                            'col':self.col, 
+                            'row':self.row,
+                            'token':"number",
+                            'lexema':int(word),
+                            'type':type (int(word)).__name__
                         })
                     elif(self.tokenize.isRomanNumber(word)):
                         for letter in word:
@@ -60,7 +72,8 @@ class Compiler:
                                     'col':self.col, 
                                     'row':self.row,
                                     'token':self.tokenize.roman_values(letter),
-                                    'lexema':letter
+                                    'lexema':letter,
+                                    'type':type (letter).__name__
                                 })
                     else:
                         self.id+=1
@@ -69,9 +82,19 @@ class Compiler:
                             'col':self.col, 
                             'row':self.row,
                             'token':"ERROR",
-                            'lexema':word
+                            'lexema':word,
+                            'type':type (word).__name__
                         })
                     self.col+=1
+                self.id+=1
+                self.symbols.add({
+                            'id':self.id,
+                            'col':self.col, 
+                            'row':self.row,
+                            'token':"end",
+                            'lexema':"end",
+                            'type':type("end").__name__
+                        })
             self.symbols.show()
         else:
             print("(o_o) Come on, You must put some text on your file!")

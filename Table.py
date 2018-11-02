@@ -5,7 +5,8 @@ class symbolTable:
             'col':data['col'], 
             'row':data['row'],
             'token':data['token'],
-            'lexema':data['lexema']
+            'lexema':data['lexema'],
+            'type':data['type']
             }
     def show(self):
         values=self.Table.values()

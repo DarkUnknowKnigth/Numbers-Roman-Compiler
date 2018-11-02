@@ -62,6 +62,10 @@ class Tokenize:
         'hex':{
             "lex":"hex",
             "regex":r"\bhex\b"
+        },
+        'rom':{
+            'lex':'rom',
+            'regex':r"\brom\b"
         }
     }
     NUMBER={
@@ -106,10 +110,10 @@ class Tokenize:
         else:
             return ("Invalid Reserved Token","the charter: "+charter+" is invalid")
     def isNumber(self,charter):
-        if(re.match(self.NUMBER['regex'],charter)):
-            return False
-        else:
+        if(re.match(self.NUMBER['number']['regex'],charter)):
             return True
+        else:
+            return False
 
 
 
