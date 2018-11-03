@@ -1,5 +1,6 @@
 from Table import *
 from Tokenize import *
+from TableError import *
 import sys
 import os
 class Compiler:
@@ -7,11 +8,12 @@ class Compiler:
     filename=None
     code=None
     symbols=symbolTable()
-    errors=symbolTable()
+    errors=errorTable()
     tokenize=Tokenize()
     row=0
     col=0
     id=0
+    idr=0
     def __init__(self,data):
         self.path=str(data[0])
         self.filename=str(data[1])
@@ -76,14 +78,21 @@ class Compiler:
                                     'type':type (letter).__name__
                                 })
                     else:
-                        self.id+=1
-                        self.symbols.add({
-                            'id':self.id,
+                        self.idr+=1
+                        self.col+=len(word)
+                        self.errors.add({
+                            'id':self.idr,
                             'col':self.col, 
                             'row':self.row,
                             'token':"ERROR",
                             'lexema':word,
-                            'type':type (word).__name__
+                            'type':type (word).__name__,
+                            'type_error':"(#_#) Invalid sintaxis error: "+line+" in line:"+str(self.row)+" in col:"+str(self.col),
+                            'description':"(=_=) You code have this word: "+word+" and I don't know whats means...",
+                            'etc':{
+                                "line":line,
+                                "word":word,
+                            }
                         })
                     self.col+=1
                 self.id+=1
@@ -95,6 +104,8 @@ class Compiler:
                             'lexema':"end",
                             'type':type("end").__name__
                         })
+                self.col=0
+            self.errors.debug()
             self.symbols.show()
         else:
             print("(o_o) Come on, You must put some text on your file!")
