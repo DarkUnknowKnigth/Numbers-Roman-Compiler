@@ -77,14 +77,12 @@ class Tokenize:
     reservedKeys=RESERVED.keys()    
     ##METODOS 
     def isRomanNumber(self,word):
-        flag=True
         for letter in word:
             if letter == 'I' or letter =="V" or letter == "X" or letter == 'L' or letter =="C" or letter == "D" or letter == 'M' :
-                flag=True
+                None   
             else:
-                flag=False
                 return False
-        return flag        
+        return True        
     def isRoman(self,charter):#si es romano?
         for key in self.romaKeys: #iteramos las llaves del diccionario
             if(re.match(self.ROMAN[key]['regex'],charter)): #si la expresion regular de la llave conicide

@@ -8,7 +8,7 @@ class symbolTable:
             'lexema':data['lexema'],
             'type':data['type']
             }
-    def show(self):
+    def debug(self):
         values=self.Table.values()
         for value in values:
             print(value)
