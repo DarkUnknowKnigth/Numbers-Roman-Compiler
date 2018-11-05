@@ -12,10 +12,34 @@ class Compiler:
     errors=errorTable()
     tokenize=Tokenize()
     parser=parser()
+    treeParse={}
     row=0
     col=0
     id=0
     idr=0
+    def toDec(self,tokens):
+        i=0
+        for token in tokens:
+            if(tokens[i]=="I" and tokens[i+1]!="V" and tokens[i+1]!="X"):
+                dec+=1
+            elif(tokens[i]=="I" and (tokens[i+1]=="V" or tokens[i+1]=="V")):
+                dec-=1
+            elif(tokens[i]=="V"):
+                dec+=5
+            elif(tokens[i]=="X" and (tokens[i+1]=="C" or tokens[i+1]=="L")):
+                dec-=10
+            elif(tokens[i]=="X" and tokens[i+1]!="C" and tokens[i+1]!="L"):
+                dec+=10
+            elif(tokens[i]=="L"):
+                dec+=50
+            elif(tokens[i]=="C" and (tokens[i+1]=="M" or tokens[i+1]=="D")):
+                dec-=100
+            elif(tokens[i]=="C" and tokens[i+1]!="M" and tokens[i+1]!="D"):
+                dec+=100
+            elif(tokens[i]=="D"):
+                dec+=500
+            elif tokens[i]=="M":
+                dec+=1000
     def __init__(self,data):
         self.path=str(data[0])
         self.filename=str(data[1])
@@ -50,6 +74,7 @@ class Compiler:
                 'lexema':"begin",
                 'type':"str"
             })
+            ###################Tokenizing
             for line in lines:
                 self.row+=1
                 self.id+=1
@@ -154,10 +179,12 @@ class Compiler:
                 'lexema':"end",
                 'type':type("end").__name__
                 })
-            self.errors.debug()
-            self.symbols.debug()
+            #self.errors.debug()
+            #self.symbols.debug()
+            #############################Parsing
             if(self.parser.treeParse(self.symbols.Table)):
-                self.parser.analize()
+                self.treeParse=self.parser.analize()
+                print(self.treeParse)
             else:
                 print("(X_X) I had an error when i was parsing!!!")
                 exit()            

@@ -3,7 +3,9 @@ class parser:
     TOKENS={}
     TREES={}
     SYNTAXIS={}
+    SYNTAXIS_ERROR={}
     idSyntacis=0
+    idErrorSyntaxis=0
     GRAMMAR={
         'units':{
             'generation':["I","II","III","IV","V","VI","VII","VIII","IX"],
@@ -51,12 +53,48 @@ class parser:
     def analize(self):
         print("(U-U) Parsing and analyzing syntaxis!")
         lines=self.TREES.values()
-        print(lines)
         nline=0;
         for line in lines:
             tokens=line['instruction']
             if(tokens[0]== "begin"):
-                print("First")
+                self.idSyntacis+=1
+                self.addSyntaxis({
+                    'id':self.idSyntacis,
+                    'tokens':tokens[0],
+                    'name':"begin"
+                })
+            elif tokens[0]=="beginln" and tokens[1]=="rbgn":
+                roman=""
+                i=2
+                while tokens[i] != "rend":
+                    roman+=tokens[i]
+                    i+=1
+                if self.isRoman(roman) and tokens[i]=="rend" and tokens[i+1]=="endln":
+                    self.idSyntacis+=1
+                    self.addSyntaxis({
+                        'id':self.idSyntacis,
+                        'tokens':[roman],
+                        'name':"automatic"
+                    })
+                else:
+                    self.idErrorSyntaxis+=1
+                    self.SYNTAXIS_ERROR[self.idErrorSyntaxis]=line
+            elif(tokens[0]=="beginln" and tokens[1]=="rbgn"):
+                roman=""
+                i=2
+                while tokens[i] != "rend":
+                    roman+=tokens[i]
+                    i+=1
+                if self.isRoman(roman) and tokens[i]=="rend" and self.isType(tokens[i+1]) and tokens[i+2]=="endln":
+                    self.idSyntacis+=1
+                    self.addSyntaxis({
+                        'id':self.idSyntacis,
+                        'tokens':[roman,tokens[i+1]],
+                        'name':"fast"
+                    })
+                else:
+                    self.idErrorSyntaxis+=1
+                    self.SYNTAXIS_ERROR[self.idErrorSyntaxis]=line
             elif(tokens[0]=="beginln" and tokens[1]=="convert" and tokens[2]=="rbgn"):
                 roman=""
                 i=3
@@ -65,36 +103,67 @@ class parser:
                     i+=1
                 if self.isRoman(roman) and tokens[i]=="rend" and tokens[i+1]=="to":
                     i+=2
-                    if(self.isType(tokens[i])):
+                    if(self.isType(tokens[i]) and tokens[i+1]=="endln"):
                         self.idSyntacis+=1
                         self.addSyntaxis({
                             'id':self.idSyntacis,
-                            'tokens':tokens
+                            'tokens':['convert',roman,'to',tokens[i]],
+                            'name':'convert_rom'
+                        })
+                else:
+                    self.idErrorSyntaxis+=1
+                    self.SYNTAXIS_ERROR[self.idErrorSyntaxis]=line
+            elif(tokens[0]=="beginln" and tokens[1]=="convert"):
+                if(type(tokens[2]) is int and tokens[3]=="to"):
+                    if(self.isType(tokens[4]) and tokens[5]=="endln"):
+                        self.idSyntacis+=1
+                        self.addSyntaxis({
+                            'id':self.idSyntacis,
+                            'tokens':['convert',tokens[2],'to',tokens[4]],
+                            'name':'convert_dec'
                         })
                     else:
-                        print("(X_X) you have a syntaxis erro in "+" ".join(map(str,tokens)))
+                        self.idErrorSyntaxis+=1
+                        self.SYNTAXIS_ERROR[self.idErrorSyntaxis]=line
+                else:
+                    self.idErrorSyntaxis+=1
+                    self.SYNTAXIS_ERROR[self.idErrorSyntaxis]=line
+            #####faltan los casos de erro
             elif(tokens[0]== "end"):
-                print("Last")
+                self.idSyntacis+=1
+                self.addSyntaxis({
+                    'id':self.idSyntacis,
+                    'tokens':tokens[0],
+                    'name':'end'
+                })
+            else:
+                self.idErrorSyntaxis+=1
+                self.SYNTAXIS_ERROR[self.idErrorSyntaxis]=line
+        return self.SYNTAXIS
+        #print(self.SYNTAXIS)
+        #print(self.SYNTAXIS_ERROR)
     def treeParse(self,tableTokens):
         self.TOKENS=tableTokens
         if(self.TOKENS!= None and self.TOKENS!= {}):
             keys=self.TOKENS.keys()
             row=0
             instruction=[]
+            lexemas=[]
             for key in keys:
                 if(row==self.TOKENS[key]['row']):
-                   instruction.append(self.TOKENS[key]['token'])
+                   instruction.append(self.TOKENS[key]['lexema'])
                 else:
                     self.addTree({
                         "id":self.TOKENS[key]['row'],
-                        'instruction':instruction
+                        'instruction':instruction,
                     })
                     row=self.TOKENS[key]['row']
                     instruction=[]
+                    lexemas=[]
                     instruction.append(self.TOKENS[key]['token'])
             self.addTree({
-                "id":self.TOKENS[key]['row'],
-                'instruction':instruction
+                "id":row+1,#debug and add the final
+                'instruction':instruction,
             })
             return True
         else:
@@ -129,7 +198,7 @@ class parser:
         for thousand in thousands:
             mn.append(thousand)
             for cn in cns:
-                mn.append(thousand+cn)
+                mn.append(thousand+cn)       
         return mn
     def generateConversion(self):
         conversion=[]
@@ -163,10 +232,10 @@ class parser:
         return False
     def addTree(self,tree):
         self.TREES[tree['id']]={  
-            'instruction':tree['instruction'],#array of tokens
+            'instruction':tree['instruction']
             }
     def addSyntaxis(self,tokens):
         self.SYNTAXIS[tokens['id']]={  
-            'tokens':tokens['tokens'],#array of tokens
+            tokens['name']:tokens['tokens']
             }
 
