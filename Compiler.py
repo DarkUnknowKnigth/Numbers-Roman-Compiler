@@ -2,6 +2,7 @@ from Table import *
 from Tokenize import *
 from TableError import *
 from Parser import *
+from Semantic import *
 import sys
 import os
 class Compiler:
@@ -12,6 +13,7 @@ class Compiler:
     errors=errorTable()
     tokenize=Tokenize()
     parser=parser()
+    semantic=semantic()
     treeParse={}
     row=0
     col=0
@@ -185,6 +187,8 @@ class Compiler:
             if(self.parser.treeParse(self.symbols.Table)):
                 self.treeParse=self.parser.analize()
                 print(self.treeParse)
+                self.semantic.addSyntaxis(self.treeParse[1])
+                
             else:
                 print("(X_X) I had an error when i was parsing!!!")
                 exit()            

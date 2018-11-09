@@ -53,7 +53,6 @@ class parser:
     def analize(self):
         print("(U-U) Parsing and analyzing syntaxis!")
         lines=self.TREES.values()
-        nline=0;
         for line in lines:
             tokens=line['instruction']
             if(tokens[0]== "begin"):
@@ -108,7 +107,7 @@ class parser:
                         self.addSyntaxis({
                             'id':self.idSyntacis,
                             'tokens':['convert',roman,'to',tokens[i]],
-                            'name':'convert_rom'
+                            'name':'convert'##romman
                         })
                 else:
                     self.idErrorSyntaxis+=1
@@ -120,7 +119,7 @@ class parser:
                         self.addSyntaxis({
                             'id':self.idSyntacis,
                             'tokens':['convert',tokens[2],'to',tokens[4]],
-                            'name':'convert_dec'
+                            'name':'convert'##dec
                         })
                     else:
                         self.idErrorSyntaxis+=1
@@ -139,7 +138,14 @@ class parser:
             else:
                 self.idErrorSyntaxis+=1
                 self.SYNTAXIS_ERROR[self.idErrorSyntaxis]=line
-        return self.SYNTAXIS
+        syntaxis=[]
+        for key in self.SYNTAXIS.keys():
+            print(self.SYNTAXIS[key].keys())
+            if(self.SYNTAXIS[key].keys()[0]!="convert" or self.SYNTAXIS[key].keys()[0]!="begin"):
+                syntaxis.append(self.SYNTAXIS[key].keys()[0])
+            for token in self.SYNTAXIS[key].values()[0]:
+                syntaxis.append(token)
+        return (self.SYNTAXIS,syntaxis) 
         #print(self.SYNTAXIS)
         #print(self.SYNTAXIS_ERROR)
     def treeParse(self,tableTokens):
